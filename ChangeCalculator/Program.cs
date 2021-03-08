@@ -70,44 +70,30 @@ namespace ChangeCalculator
         /// <param name="productPriceStr">String that contains the product price</param>
         /// <param name="paymentAmountStr">String that contains the payment amount</param>
         /// <returns>A boolean value specifying whether the input is valid</returns>
-        private static bool ValidateProductPriceAndPayment(string productPriceStr, string paymentAmountStr)
+        private static string ValidateProductPriceAndPayment(string productPriceStr, string paymentAmountStr)
         {
-            bool isValid = true;
             decimal productPrice = 0;
             decimal paymentAmount = 0;
 
             if (!decimal.TryParse(productPriceStr, out productPrice))
-            {
-                Console.WriteLine("It looks like the product price is not valid, please try again");
-                isValid = false;
-            }
-            else if (!decimal.TryParse(paymentAmountStr, out paymentAmount))
-            {
-                Console.WriteLine("It looks like the payment amount is not valid, please try again");
-                isValid = false;
-            }
-            else if (productPrice == 0)
-            {
-                Console.WriteLine("Everyone loves freebies!");
-                isValid = false;
-            }
-            else if (productPrice < 0)
-            {
-                Console.WriteLine("Someone is paying you to take the products? Lucky you!");
-                isValid = false;
-            }
-            else if (paymentAmount <= 0)
-            {
-                Console.WriteLine("I have no money, do you accept cryptocurrency?");
-                isValid = false;
-            }
-            else if (paymentAmount < productPrice)
-            {
-                Console.WriteLine("Just a few pennies short...");
-                isValid = false;
-            }
+                return "It looks like the product price is not valid, please try again";
 
-            return isValid;
+            if (!decimal.TryParse(paymentAmountStr, out paymentAmount))
+                return "It looks like the payment amount is not valid, please try again";
+
+            if (productPrice == 0)
+                return "Everyone loves freebies!";
+
+            if (productPrice < 0)
+                return "Someone is paying you to take the products? Lucky you!";
+
+            if (paymentAmount <= 0)
+                return "I have no money, do you accept cryptocurrency?";
+
+            if (paymentAmount < productPrice)
+                return "Just a few pennies short...";
+
+            return string.Empty;
         }
 
         public static void Main(string[] args)
@@ -115,6 +101,9 @@ namespace ChangeCalculator
             string productPriceStr = "";
             string paymentAmountStr = "";
             bool quitApp = false;
+
+            Console.WriteLine("Welcome to the Change Calculator");
+            Console.WriteLine("Note: Please use a dot '.' to enter decimal values");
 
             while (!quitApp)
             {
@@ -127,7 +116,12 @@ namespace ChangeCalculator
                     Console.WriteLine("Please enter the payment amount:");
                     paymentAmountStr = Console.ReadLine();
 
-                    inputValid = ValidateProductPriceAndPayment(productPriceStr, paymentAmountStr);
+                    string validationMsg = ValidateProductPriceAndPayment(productPriceStr, paymentAmountStr);
+
+                    inputValid = String.IsNullOrEmpty(validationMsg);
+
+                    if (!inputValid)
+                        Console.WriteLine(validationMsg);
                 }
 
                 //At this stage input is valid so calculate the change
