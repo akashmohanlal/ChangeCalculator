@@ -24,54 +24,30 @@ namespace ChangeCalculator
         }
 
         /// <summary>
-        /// The method recursively calculates the change by comparing the amount with a predefined currency list
+        /// The method calculates the change due by iterating through the currency available
         /// </summary>
         /// <param name="amount">The amount of change that is due</param>
-        /// <param name="currencyDefinition">List of available currency notes and coins</param>
-        private static List<string> CalculateChange(int amount)
+        private static List<string> CalculateChange(string productPriceStr, string paymentAmountStr)
         {
-            var result = new List<string> { "Your change is:" };
-            CurrencyDefinition.OrderByDescending(a => a).ToList().ForEach(currentCurrencyValue =>
-            {
-                int changeDue = amount / currentCurrencyValue;
-                amount -= (currentCurrencyValue * changeDue);
+            var result = new List<string> { "Your change is:" };           
+            decimal productPrice = decimal.Parse(productPriceStr);
+            decimal paymentAmount = decimal.Parse(paymentAmountStr);
+            int change = decimal.ToInt32((paymentAmount - productPrice) * 100);
 
-                //if change is due print with predefined format
-                if (changeDue != 0)
+            CurrencyDefinition.OrderByDescending(a => a).ToList()
+                .ForEach(currentCurrencyValue =>
                 {
-                    result.Add(FormatOutput(changeDue, currentCurrencyValue));
-                }     
-            });
+                    int changeDue = change / currentCurrencyValue;
+                    change -= (currentCurrencyValue * changeDue);
+
+                    //if change is due print with predefined format
+                    if (changeDue != 0)
+                    {
+                        result.Add(FormatOutput(changeDue, currentCurrencyValue));
+                    }
+                });
 
             return result;
-
-            ////end of recursive behaviour
-            //if (amount == 0 || availableCurrency.Count == 0)
-            //{
-            //    Console.WriteLine("");
-            //}
-            //else
-            //{
-            //    int currentCurrencyValue = availableCurrency.First();
-
-            //    //for the first line we want to display the line 'your change is...'
-            //    if (currentCurrencyValue == CurrencyDefinition.OrderByDescending(a => a).First())
-            //    {
-            //        Console.WriteLine("Your change is:");
-            //    }
-
-            //    int changeDue = amount / currentCurrencyValue;
-            //    int remainingChangeDue = amount - (currentCurrencyValue * changeDue);
-
-            //    //if change is due print with predefined format
-            //    if (changeDue != 0)
-            //    {
-            //        WriteOutput(changeDue, currentCurrencyValue);
-            //    }
-
-            //    //recursively iterate through the currency definition
-            //    CalculateChange(remainingChangeDue, availableCurrency.Skip(1).ToList());
-            //}
         }
 
         /// <summary>
@@ -145,12 +121,8 @@ namespace ChangeCalculator
                     inputValid = ValidateProductPriceAndPayment(productPriceStr, paymentAmountStr);
                 }
 
-                //At this stage the input is valid
-                decimal productPrice = decimal.Parse(productPriceStr);
-                decimal paymentAmount = decimal.Parse(paymentAmountStr);
-
-                int change = decimal.ToInt32((paymentAmount - productPrice) * 100);
-                List<string> output = CalculateChange(change);
+                //At this stage input is valid so calculate the change
+                List<string> output = CalculateChange(productPriceStr, paymentAmountStr);
 
                 output.ForEach(line => Console.WriteLine(line));
 
