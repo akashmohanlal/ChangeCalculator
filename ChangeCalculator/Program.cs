@@ -26,7 +26,9 @@ namespace ChangeCalculator
         /// <summary>
         /// The method calculates the change due by iterating through the currency available
         /// </summary>
-        /// <param name="amount">The amount of change that is due</param>
+        /// <param name="productPriceStr">String that contains the product price</param>
+        /// <param name="paymentAmountStr">String that contains the payment amount</param>
+        /// <returns></returns>
         private static List<string> CalculateChange(string productPriceStr, string paymentAmountStr)
         {
             var result = new List<string> { "Your change is:" };           
@@ -122,9 +124,8 @@ namespace ChangeCalculator
                 }
 
                 //At this stage input is valid so calculate the change
-                List<string> output = CalculateChange(productPriceStr, paymentAmountStr);
-
-                output.ForEach(line => Console.WriteLine(line));
+                CalculateChange(productPriceStr, paymentAmountStr)
+                    .ForEach(line => Console.WriteLine(line));
 
                 //Application controller
                 Console.WriteLine("To end enter 'q', otherwise press enter");
