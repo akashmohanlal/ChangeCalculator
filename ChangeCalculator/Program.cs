@@ -30,7 +30,7 @@ namespace ChangeCalculator
         }
 
         /// <summary>
-        /// The method calculates the change due by iterating through the currency available
+        /// The method calculates the change due by iterating through the currency definition
         /// </summary>
         /// <param name="productPriceStr">String that contains the product price</param>
         /// <param name="paymentAmountStr">String that contains the payment amount</param>
@@ -46,7 +46,7 @@ namespace ChangeCalculator
                 return new List<string> { "No change due" };
             }
 
-            var result = new List<string> { "Your change is:" };
+            var output = new List<string> { "Your change is:" };
 
             CurrencyDefinition.OrderByDescending(a => a).ToList()
                 .ForEach(currentCurrencyValue =>
@@ -56,12 +56,11 @@ namespace ChangeCalculator
 
                     //if change is due format the output
                     if (changeDue != 0)
-                    {
-                        result.Add(FormatOutput(changeDue, currentCurrencyValue));
-                    }
+                        output.Add(FormatOutput(changeDue, currentCurrencyValue));
+                    
                 });
 
-            return result;
+            return output;
         }
 
         /// <summary>
@@ -103,7 +102,7 @@ namespace ChangeCalculator
             bool quitApp = false;
 
             Console.WriteLine("Welcome to the Change Calculator");
-            Console.WriteLine("Note: Please use a dot '.' to enter decimal values");
+            Console.WriteLine($"Note: Please use a dot '.' to enter decimal values{Environment.NewLine}");
 
             while (!quitApp)
             {
