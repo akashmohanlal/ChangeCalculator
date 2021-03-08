@@ -11,18 +11,16 @@ namespace ChangeCalculator
         //uniform definition from 1 penny to 5000 pennies or £50
         private static readonly List<int> CurrencyDefinition = new List<int> { 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000 };
 
-        private static void WriteOutput(int change, int currentValue)
+        private static string FormatOutput(int change, int currentValue)
         {
             //if the current value is > 50 we need to convert it from pennies to pounds
             //100 pennies = £1
             if (currentValue > 50)
             {
-                Console.WriteLine($"{change} x £{currentValue / 100}");
+                return $"{change} x £{currentValue / 100}";
             }
-            else
-            {
-                Console.WriteLine($"{change} x {currentValue}p");
-            }
+
+            return $"{change} x {currentValue}p";
         }
 
         /// <summary>
@@ -30,35 +28,50 @@ namespace ChangeCalculator
         /// </summary>
         /// <param name="amount">The amount of change that is due</param>
         /// <param name="currencyDefinition">List of available currency notes and coins</param>
-        private static void CalculateChange(int amount, List<int> availableCurrency)
+        private static List<string> CalculateChange(int amount)
         {
-            //end of recursive behaviour
-            if (amount == 0 || availableCurrency.Count == 0)
+            var result = new List<string> { "Your change is:" };
+            CurrencyDefinition.OrderByDescending(a => a).ToList().ForEach(currentCurrencyValue =>
             {
-                Console.WriteLine("");
-            }
-            else
-            {
-                int currentCurrencyValue = availableCurrency.First();
-
-                //for the first line we want to display the line 'your change is...'
-                if (currentCurrencyValue == CurrencyDefinition.OrderByDescending(a => a).First())
-                {
-                    Console.WriteLine("Your change is:");
-                }
-
                 int changeDue = amount / currentCurrencyValue;
-                int remainingChangeDue = amount - (currentCurrencyValue * changeDue);
+                amount -= (currentCurrencyValue * changeDue);
 
                 //if change is due print with predefined format
                 if (changeDue != 0)
                 {
-                    WriteOutput(changeDue, currentCurrencyValue);
-                }
+                    result.Add(FormatOutput(changeDue, currentCurrencyValue));
+                }     
+            });
 
-                //recursively iterate through the currency definition
-                CalculateChange(remainingChangeDue, availableCurrency.Skip(1).ToList());
-            }
+            return result;
+
+            ////end of recursive behaviour
+            //if (amount == 0 || availableCurrency.Count == 0)
+            //{
+            //    Console.WriteLine("");
+            //}
+            //else
+            //{
+            //    int currentCurrencyValue = availableCurrency.First();
+
+            //    //for the first line we want to display the line 'your change is...'
+            //    if (currentCurrencyValue == CurrencyDefinition.OrderByDescending(a => a).First())
+            //    {
+            //        Console.WriteLine("Your change is:");
+            //    }
+
+            //    int changeDue = amount / currentCurrencyValue;
+            //    int remainingChangeDue = amount - (currentCurrencyValue * changeDue);
+
+            //    //if change is due print with predefined format
+            //    if (changeDue != 0)
+            //    {
+            //        WriteOutput(changeDue, currentCurrencyValue);
+            //    }
+
+            //    //recursively iterate through the currency definition
+            //    CalculateChange(remainingChangeDue, availableCurrency.Skip(1).ToList());
+            //}
         }
 
         /// <summary>
@@ -137,7 +150,9 @@ namespace ChangeCalculator
                 decimal paymentAmount = decimal.Parse(paymentAmountStr);
 
                 int change = decimal.ToInt32((paymentAmount - productPrice) * 100);
-                CalculateChange(change, CurrencyDefinition.OrderByDescending(a => a).ToList());
+                List<string> output = CalculateChange(change);
+
+                output.ForEach(line => Console.WriteLine(line));
 
                 //Application controller
                 Console.WriteLine("To end enter 'q', otherwise press enter");
