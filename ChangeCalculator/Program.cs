@@ -17,7 +17,7 @@ namespace ChangeCalculator
         /// <param name="change">The amount of change due</param>
         /// <param name="currentValue">The current currency value</param>
         /// <returns>A formatted string that contains the change details</returns>
-        private static string FormatOutput(int change, int currentValue)
+        private static string FormatOutput(long change, int currentValue)
         {
             //if the current value is > 50 we need to convert it from pennies to pounds
             //100 pennies = £1
@@ -39,7 +39,16 @@ namespace ChangeCalculator
         {
             decimal productPrice = decimal.Parse(productPriceStr);
             decimal paymentAmount = decimal.Parse(paymentAmountStr);
-            int change = decimal.ToInt32((paymentAmount - productPrice) * 100);
+            long change = 0;
+            
+            try
+            {
+                 change = decimal.ToInt64((paymentAmount - productPrice) * 100);
+            }
+            catch
+            {
+                return new List<string> { "Oops! Looks like something went terribly wrong, please try again" };
+            }
 
             if (change == 0)
             {
@@ -51,7 +60,7 @@ namespace ChangeCalculator
             CurrencyDefinition.OrderByDescending(a => a).ToList()
                 .ForEach(currentCurrencyValue =>
                 {
-                    int changeDue = change / currentCurrencyValue;
+                    long changeDue = change / currentCurrencyValue;
                     change -= (currentCurrencyValue * changeDue);
 
                     //if change is due format the output
@@ -120,15 +129,16 @@ namespace ChangeCalculator
                     inputValid = String.IsNullOrEmpty(validationMsg);
 
                     if (!inputValid)
-                        Console.WriteLine(validationMsg);
+                        Console.WriteLine(validationMsg + Environment.NewLine);
                 }
 
                 //At this stage input is valid so calculate the change
-                CalculateChange(productPriceStr, paymentAmountStr)
+                CalculateChange(productPriceStr, paymentAmountStr)                    
                     .ForEach(line => Console.WriteLine(line));
+                Console.WriteLine();
 
                 //Application controller
-                Console.WriteLine("To end enter 'q', otherwise press enter");
+                Console.WriteLine("To end enter 'q', otherwise press any other key");
                 if (Console.ReadLine() == "q")
                     return;
             }
