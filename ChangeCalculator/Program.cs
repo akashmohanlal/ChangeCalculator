@@ -11,6 +11,12 @@ namespace ChangeCalculator
         //uniform definition from 1 penny to 5000 pennies or £50
         private static readonly List<int> CurrencyDefinition = new List<int> { 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000 };
 
+        /// <summary>
+        /// Helper method that formats the output
+        /// </summary>
+        /// <param name="change">The amount of change due</param>
+        /// <param name="currentValue">The current currency value</param>
+        /// <returns>A formatted string that contains the change details</returns>
         private static string FormatOutput(int change, int currentValue)
         {
             //if the current value is > 50 we need to convert it from pennies to pounds
@@ -28,13 +34,19 @@ namespace ChangeCalculator
         /// </summary>
         /// <param name="productPriceStr">String that contains the product price</param>
         /// <param name="paymentAmountStr">String that contains the payment amount</param>
-        /// <returns></returns>
+        /// <returns>A list of strings that contains all the change broken down by currency values</returns>
         private static List<string> CalculateChange(string productPriceStr, string paymentAmountStr)
         {
-            var result = new List<string> { "Your change is:" };           
             decimal productPrice = decimal.Parse(productPriceStr);
             decimal paymentAmount = decimal.Parse(paymentAmountStr);
             int change = decimal.ToInt32((paymentAmount - productPrice) * 100);
+
+            if (change == 0)
+            {
+                return new List<string> { "No change due" };
+            }
+
+            var result = new List<string> { "Your change is:" };
 
             CurrencyDefinition.OrderByDescending(a => a).ToList()
                 .ForEach(currentCurrencyValue =>
@@ -42,7 +54,7 @@ namespace ChangeCalculator
                     int changeDue = change / currentCurrencyValue;
                     change -= (currentCurrencyValue * changeDue);
 
-                    //if change is due print with predefined format
+                    //if change is due format the output
                     if (changeDue != 0)
                     {
                         result.Add(FormatOutput(changeDue, currentCurrencyValue));
@@ -57,7 +69,7 @@ namespace ChangeCalculator
         /// </summary>
         /// <param name="productPriceStr">String that contains the product price</param>
         /// <param name="paymentAmountStr">String that contains the payment amount</param>
-        /// <returns></returns>
+        /// <returns>A boolean value specifying whether the input is valid</returns>
         private static bool ValidateProductPriceAndPayment(string productPriceStr, string paymentAmountStr)
         {
             bool isValid = true;
@@ -92,11 +104,6 @@ namespace ChangeCalculator
             else if (paymentAmount < productPrice)
             {
                 Console.WriteLine("Just a few pennies short...");
-                isValid = false;
-            }
-            else if (paymentAmount == productPrice)
-            {
-                Console.WriteLine("No change due...");
                 isValid = false;
             }
 
